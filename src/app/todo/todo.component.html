@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="col-xs-10">
+    <app-todo-edit></app-todo-edit>
+    <hr>
+    <ul class="list-group">
+      <li class="list-group-item cp" *ngFor="let task of todoList; let i = index" (click)="updateTaskInitialized(i)">
+        {{ i + 1 }}) Complete {{ task?.taskName }} by <strong> {{ task?.endDate | date:'fullDate' }} </strong>
+      </li>
+    </ul>
+  </div>
+</div>
