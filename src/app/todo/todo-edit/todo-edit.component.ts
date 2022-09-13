@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { editModel, Todo } from '../todo.model';
@@ -12,6 +12,7 @@ import { TodoService } from '../todo.service';
 export class TodoEditComponent implements OnInit {
 
   @ViewChild(NgForm) todoForm!: NgForm;
+  @Input() errorMessage!: any | null;
   today: Date = new Date();
   editConfig: editModel = {
     editMode: false
@@ -43,8 +44,9 @@ export class TodoEditComponent implements OnInit {
   submitForm(form: NgForm) {
     const taskName = form?.value?.taskname;
     const endDate = form?.value?.enddate;
-    if(this.editConfig?.editMode && this.editConfig?.editIndex) {
-      this.todoService.editTask({ taskName, endDate }, this.editConfig.editIndex);
+    const index = typeof this.editConfig?.editIndex === 'number';
+    if(this.editConfig?.editMode && index) {
+      this.todoService.editTask({ taskName, endDate }, <number>this.editConfig.editIndex);
     } else {
       this.todoService.addTask(taskName, endDate);
     }
@@ -59,7 +61,7 @@ export class TodoEditComponent implements OnInit {
   }
 
   deleteTask() {
-    this.todoService.deleteTask(<number>this.editConfig.editIndex);
+    this.todoService.deleteTask(<number>this.editConfig.editIndex)?.subscribe();
     this.clearForm();
   }
 

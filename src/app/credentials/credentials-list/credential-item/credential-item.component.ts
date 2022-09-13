@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Credential } from '../../credentials.model';
 
 @Component({
   selector: 'app-credential-item',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./credential-item.component.scss']
 })
 export class CredentialItemComponent implements OnInit {
+  @Input('id') id!: number;
+  @Input() credential!: Credential;
 
   constructor() { }
 

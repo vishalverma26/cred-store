@@ -1,4 +1,5 @@
 export class Todo {
+  // endDate should be in 'yyyy-mm-dd' format
   constructor(public taskName: string, public endDate: string) {}
 }
 

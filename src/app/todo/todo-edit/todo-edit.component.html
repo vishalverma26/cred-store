@@ -1,3 +1,4 @@
+<app-error-alert *ngIf="errorMessage" [errorMessage]="errorMessage"></app-error-alert>
 <div class="row">
   <div class="col-xs-12">
     <form #todoForm="ngForm" (submit)="submitForm(todoForm)">
@@ -9,8 +10,11 @@
         </div>
         <div class="col-sm-5 form-group">
           <label for="taskenddate"> Task End Date </label>
-          <input type="date" #enddate="ngModel" ngModel name ="enddate" id="taskenddate" class="form-control" [attr.min]="today" required>
-          <span *ngIf="enddate.invalid && enddate.touched" class="help-block error"> Please enter valid date! </span>
+          <input appMinDate type="date" #enddate="ngModel" ngModel name ="enddate" id="taskenddate" class="form-control" [attr.min]="today" required>
+          <span *ngIf="enddate.invalid && enddate.touched" class="help-block error">
+            Please enter valid date!
+            <span *ngIf="enddate.errors?.['minDate']"> Date can't be less than today's! </span>
+          </span>
         </div>
         <div class="col-xs-12">
           <button class="btn btn-success" type="submit" [disabled]="todoForm.invalid || todoForm.pristine"> {{ editConfig.editMode ? 'Update Task' : 'Add Task' }} </button>
