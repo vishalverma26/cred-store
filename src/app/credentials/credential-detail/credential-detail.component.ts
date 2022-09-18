@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Todo } from 'src/app/todo/todo.model';
 import { Credential } from '../credentials.model';
 import { CredentialService } from '../credentials.service';
 
@@ -22,4 +23,16 @@ export class CredentialDetailComponent implements OnInit {
     });
   }
 
+  deleteCredential() {
+    this.credentialSvc.deleteCredential(this.credId).subscribe();
+  }
+
+  addtoTodoList() {
+    let taskList = [ ...<Todo[]>this.credential.taskList ];
+    if(taskList.length) {
+      for(let task of taskList) {
+        this.credentialSvc.addtoTodoList(task.taskName, task.endDate);
+      }
+    }
+  }
 }

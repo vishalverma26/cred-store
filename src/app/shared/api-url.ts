@@ -1,5 +1,7 @@
 export const API = {
-  firebase: 'https://cred-store-80d2e-default-rtdb.firebaseio.com/todolist.json',
+  todoList: 'https://cred-store-80d2e-default-rtdb.firebaseio.com/todolist.json',
   credStore:'https://cred-store-80d2e-default-rtdb.firebaseio.com/credstore.json',
-  delete: 'https://cred-store-80d2e-default-rtdb.firebaseio.com/todolist/'
+  delete: 'https://cred-store-80d2e-default-rtdb.firebaseio.com/todolist/',
+  signUp: 'https://identitytoolkit.googleapis.com/v1/accounts:signUp',
+  signIn: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
 }

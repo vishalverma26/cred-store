@@ -1,11 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { map, Subject } from "rxjs";
+import { NgModel } from "@angular/forms";
+import { map, Subject, tap } from "rxjs";
 import { CredentialService } from "src/app/credentials/credentials.service";
 import { Todo } from "src/app/todo/todo.model";
 import { TodoService } from "src/app/todo/todo.service";
 import { API } from "../api-url";
 import { Credential } from './../../credentials/credentials.model';
+
+NgModel
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +28,8 @@ export class DataStorageService {
   }
 
   fetchTodoList() {
-    return this.http.get<Todo[]>(API.firebase).pipe(map(todoList => {
+    return this.http.get<Todo[]>(API.todoList).pipe(tap(todoList => {
       this.todoService.setTodoList(todoList);
-      return todoList;
     }));
   }
 
@@ -42,7 +44,7 @@ export class DataStorageService {
       credList =  credList?.map((listItem: Credential) => {
         return { ...listItem, taskList: listItem?.taskList?.length ? listItem.taskList : [] }
       });
-      
+
       this.credSvc.setCredentialList(credList);
       return credList;
     }));

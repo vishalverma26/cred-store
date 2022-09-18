@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SimpleChange } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -14,8 +14,9 @@ import { CredentialService } from '../credentials.service';
 export class CredentialEditComponent implements OnInit {
 
   credentialForm!: FormGroup;
-  private editIndex!: number;
+  private editIndex!: number | string;
   private editMode!: boolean;
+  private isFormSubmitted!: boolean;
 
   constructor(private credentialSvc: CredentialService, private activatedRoute: ActivatedRoute) { }
 
@@ -28,9 +29,13 @@ export class CredentialEditComponent implements OnInit {
 
     this.activatedRoute.params.subscribe((params: Params) => {
       this.editIndex = params['id'],
-      this.editMode = this.editIndex != null;
+        this.editMode = this.editIndex != null;
 
       this.initForm();
+    });
+
+    this.credentialSvc.isFormSaved.subscribe(response => {
+      this.isFormSubmitted = response;
     })
   }
 
@@ -41,14 +46,14 @@ export class CredentialEditComponent implements OnInit {
     let taskList = new FormArray<FormGroup>([]);
 
     // if edit mode then we need to update the values
-    if(this.editMode) {
-      const editCredential = this.credentialSvc.getCredential(this.editIndex);
+    if (this.editMode) {
+      const editCredential = this.credentialSvc.getCredential(<number>this.editIndex);
       credentialName = editCredential.credentialName;
       imageUrl = editCredential.imageUrl;
       description = editCredential.description;
 
-      if(editCredential.taskList?.length) {
-        for(let task of editCredential.taskList) {
+      if (editCredential.taskList?.length) {
+        for (let task of editCredential.taskList) {
           taskList.push(
             new FormGroup({
               taskName: new FormControl(task.taskName, [Validators.required]),
@@ -71,7 +76,7 @@ export class CredentialEditComponent implements OnInit {
   onAddTask() {
     const task = new FormGroup({
       taskName: new FormControl(null, [Validators.required]),
-      endDate: new FormControl(null, [Validators.required])
+      endDate: new FormControl(null, [Validators.required, this.minDate.bind(this)])
     });
 
     (<FormArray>this.credentialForm.get('taskList')).push(task);
@@ -80,16 +85,23 @@ export class CredentialEditComponent implements OnInit {
 
   submitCredentialForm() {
     const { credentialName, imageUrl, description, taskList }: Credential = { ...this.credentialForm.value };
-    this.credentialSvc.addCredential(credentialName, imageUrl, description, <Todo[]>taskList);
+    if(!this.editMode) {
+      this.credentialSvc.addCredential(credentialName, imageUrl, description, <Todo[]>taskList).subscribe();
+    } else {
+      this.credentialSvc.editCredential(<number>this.editIndex, this.credentialForm.value).subscribe(() => {
+        this.editIndex = '';
+        this.editMode = false;
+      });
+    }
   }
 
   deleteCredential(i: number) {
     (<FormArray>this.credentialForm.get('taskList')).removeAt(i);
   }
 
-  private minDate(control: AbstractControl):  { [s: string]: boolean } | null {
+  private minDate(control: AbstractControl): { [s: string]: boolean } | null {
     const calendarDate = new Date(control.value)
-    if(calendarDate < new Date()) {
+    if (calendarDate < new Date()) {
       return { minDate: true }
     }
     return null;
@@ -97,11 +109,14 @@ export class CredentialEditComponent implements OnInit {
 
 
   canDeactivate(): boolean | Observable<boolean> | Promise<boolean> {
-    if(this.credentialForm.dirty) {
+
+    if(this.isFormSubmitted) return true;
+
+    if (this.credentialForm.dirty) {
       return confirm('Are you sure you want to move without saving ?');
-    } else {
-      return true;
     }
+
+    return true;
   }
 
 }

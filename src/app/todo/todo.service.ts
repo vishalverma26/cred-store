@@ -25,7 +25,7 @@ export class TodoService {
   }
 
   addTask(taskName: string, endDate: string) {
-    this.http.put(API.firebase, this.todoList).subscribe(() => {
+    this.http.put(API.todoList, this.todoList).subscribe(() => {
       this.todoList.push({ taskName, endDate });
       this.addEditTask.next(this.todoList.slice());
     });
@@ -40,7 +40,7 @@ export class TodoService {
   }
 
   deleteTask(index: number) {
-    if(!index) return;
+    if(!index) return null;
 
     let api = API.delete + index + '.json';
     return this.http.delete(api).pipe(map(response => {
@@ -50,7 +50,7 @@ export class TodoService {
   }
 
   editTask(task: Todo, index: number) {
-    this.http.put(API.firebase, this.todoList).subscribe(() => {
+    this.http.put(API.todoList, this.todoList).subscribe(() => {
       this.todoList[index] = task;
       this.addEditTask.next([...this.todoList]);
     });
